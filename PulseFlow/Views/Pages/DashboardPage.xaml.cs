@@ -12,7 +12,7 @@ namespace PulseFlow.Views.Pages
             ViewModel = viewModel;
             DataContext = this;
 
-            InitializeComponent();
+           InitializeComponent();
         }
     }
 }

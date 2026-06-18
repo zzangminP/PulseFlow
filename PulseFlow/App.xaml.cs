@@ -52,6 +52,9 @@ namespace PulseFlow
                 services.AddDbContext<PulseFlowDbContext>();
                 services.AddSingleton<IDatabase<SensorLog>, SensorLogService>();
 
+                services.AddHttpClient();
+                services.AddTransient<IMachineControlService, MachineControlService>();
+
                 services.AddSingleton<DashboardPage>();
                 services.AddSingleton<DashboardViewModel>();
                 services.AddSingleton<DataPage>();

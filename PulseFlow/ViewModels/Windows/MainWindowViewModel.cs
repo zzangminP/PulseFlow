@@ -13,14 +13,14 @@ namespace PulseFlow.ViewModels.Windows
         {
             new NavigationViewItem()
             {
-                Content = "Home",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.Home24 },
+                Content = "Dashboard",
+                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24},
                 TargetPageType = typeof(Views.Pages.DashboardPage)
             },
             new NavigationViewItem()
             {
                 Content = "Data",
-                Icon = new SymbolIcon { Symbol = SymbolRegular.DataHistogram24 },
+                Icon = new SymbolIcon { Symbol = SymbolRegular.Calendar3Day24 },
                 TargetPageType = typeof(Views.Pages.DataPage)
             }
         };

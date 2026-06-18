@@ -16,8 +16,13 @@ namespace PulseFlow.ViewModels.Pages
 
         private readonly IDatabase<SensorLog> database;
 
+        private bool _isLoading;
 
-
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
+        }
 
 
         #endregion
@@ -27,15 +32,6 @@ namespace PulseFlow.ViewModels.Pages
 
         [ObservableProperty]
         private IEnumerable<SensorLog?>? sensorLogs;
-
-        private bool _isLoading;
-
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set => SetProperty(ref _isLoading, value);
-        }
-
 
 
 
@@ -47,7 +43,7 @@ namespace PulseFlow.ViewModels.Pages
         #region CONSTRUCTORS
         public DataViewModel(IDatabase<SensorLog?>? database)
         {
-            this.database = database ?? throw new ArgumentNullException(nameof(database));
+            this.database = database;
         }
 
         #endregion
@@ -58,7 +54,7 @@ namespace PulseFlow.ViewModels.Pages
 
         #region METHODS
 
-        #endregion
+
 
         public Task OnNavigatedToAsync()
         {
@@ -84,5 +80,7 @@ namespace PulseFlow.ViewModels.Pages
 
 
         }
+
+        #endregion
     }
 }

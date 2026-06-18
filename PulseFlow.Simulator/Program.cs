@@ -1,82 +1,104 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Http;
 using Npgsql;
+using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
-namespace PulseFlow.Simulator
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+var machineStates = new ConcurrentDictionary<string, bool>();
+machineStates.TryAdd("Machine_A", true);
+machineStates.TryAdd("Machine_B", true);
+machineStates.TryAdd("Machine_C", true);
+
+
+app.MapPost("/api/control/{machineName}/{command}", (string machineName, string command) =>
 {
-    class Program
+    if (!machineStates.ContainsKey(machineName))
+        return Results.NotFound("기계를 찾을 수 없습니다.");
+
+    if (command.ToLower() == "stop")
     {
-        static async Task Main(string[] args)
+        machineStates[machineName] = false;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"\n[명령 수신] {machineName} 긴급 정지!\n");
+    }
+    else if (command.ToLower() == "start")
+    {
+        machineStates[machineName] = true;
+        Console.ForegroundColor = ConsoleColor.Blue;
+        Console.WriteLine($"\n[명령 수신] {machineName} 재가동!\n");
+    }
+
+    Console.ResetColor();
+    return Results.Ok();
+});
+
+
+_ = Task.Run(async () =>
+{
+    string connString = "Host=localhost;Database=PulseFlowDB;Username=postgres;Password=0000";
+    Random random = new Random();
+
+    while (true)
+    {
+        try
         {
-            Console.WriteLine("==================================================");
-            Console.WriteLine(" 🚀 PulseFlow 현장 기계 시뮬레이터 (Direct DB Insert) ");
-            Console.WriteLine("==================================================\n");
+            using var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
 
-            string connectionString = "Host=localhost;Database=PulseFlowDB;Username=postgres;Password=0000";
-
-            string[] machines = { "Machine_A", "Machine_B", "Machine_C" };
-            Random random = new Random();
-
-            Console.WriteLine("PostgreSQL로 데이터 전송을 시작합니다...\n");
-
-            while (true)
+            foreach (var machine in machineStates.Keys)
             {
-                try
+                if (machineStates[machine])
                 {
+                    double temp = Math.Round(20.0 + (random.NextDouble() * 60.0), 2);
+                    double press = Math.Round(1.0 + (random.NextDouble() * 4.0), 2);
 
-                    using (var conn = new NpgsqlConnection(connectionString))
-                    {
-                        await conn.OpenAsync();
+                    string sql = @"INSERT INTO ""SensorLogs"" (""MachineName"", ""Temperature"", ""Pressure"", ""LoggedAt"") VALUES (@m, @t, @p, @l)";
+                    using var cmd = new NpgsqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("m", machine);
+                    cmd.Parameters.AddWithValue("t", temp);
+                    cmd.Parameters.AddWithValue("p", press);
+                    cmd.Parameters.AddWithValue("l", DateTime.UtcNow);
+                    await cmd.ExecuteNonQueryAsync();
 
-                        foreach (var machine in machines)
-                        {
-                            double temp = Math.Round(20.0 + (random.NextDouble() * 60.0), 2);
-                            double press = Math.Round(1.0 + (random.NextDouble() * 4.0), 2);
-                            DateTime now = DateTime.UtcNow;
-
-
-                            string sql = @"
-                                INSERT INTO ""SensorLogs"" (""MachineName"", ""Temperature"", ""Pressure"", ""LoggedAt"") 
-                                VALUES (@m, @t, @p, @l)";
-
-                            using (var cmd = new NpgsqlCommand(sql, conn))
-                            {
-                                cmd.Parameters.AddWithValue("m", machine);
-                                cmd.Parameters.AddWithValue("t", temp);
-                                cmd.Parameters.AddWithValue("p", press);
-                                cmd.Parameters.AddWithValue("l", now);
-
-
-                                await cmd.ExecuteNonQueryAsync();
-                            }
-
-
-                            Console.ForegroundColor = GetColorForMachine(machine);
-                            Console.WriteLine($"[{now.ToLocalTime():HH:mm:ss}] {machine} 전송 완료 | 온도: {temp:F2}℃ | 압력: {press:F2}atm");
-                        }
-                    }
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss}] {machine} 정상 가동 중...");
                 }
-                catch (Exception ex)
-                {
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"[에러 발생] DB 연결 또는 저장 실패: {ex.Message}");
-                }
-
-                Console.ResetColor();
-                await Task.Delay(1000); 
             }
         }
-
-        static ConsoleColor GetColorForMachine(string machineName)
+        catch (Exception ex)
         {
-            return machineName switch
-            {
-                "Machine_A" => ConsoleColor.Cyan,
-                "Machine_B" => ConsoleColor.Green,
-                "Machine_C" => ConsoleColor.Yellow,
-                _ => ConsoleColor.White
-            };
+            Console.WriteLine($"DB 통신 에러: {ex.Message}");
+        }
+        await Task.Delay(1000);
+    }
+});
+
+
+
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var server = app.Services.GetService(typeof(IServer)) as IServer;
+    var addresses = server?.Features.Get<IServerAddressesFeature>()?.Addresses;
+
+    Console.Clear(); // 화면 한번 정리
+    Console.WriteLine("==================================================");
+    if (addresses != null)
+    {
+        foreach (var address in addresses)
+        {
+
+            Console.WriteLine($"  PulseFlow 시뮬레이터 & API 서버 작동 중");
+            Console.WriteLine($" 실제 수신 포트: {address}");
         }
     }
-}
+    Console.WriteLine("==================================================\n");
+});
+
+
+app.Run("http://localhost:5000");
