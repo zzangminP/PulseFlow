@@ -8,7 +8,7 @@
       xmlns:local="clr-namespace:PulseFlow.Views.Pages"
       xmlns:models="clr-namespace:PulseFlow.Models"
       mc:Ignorable="d"
-      d:DesignHeight="800" d:DesignWidth="1000"
+      d:DesignHeight="800" d:DesignWidth="1200"
       d:DataContext="{d:DesignInstance local:DashboardPage, IsDesignTimeCreatable=False}"
       Title="DashboardPage">
 
@@ -23,9 +23,9 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Margin="10,0,20,0">
-            <TextBlock Text="Control Panel" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" />
+            <!--<TextBlock Text="Panel" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" /> -->
 
-            <ui:Card Margin="0,0,0,20" Background="#1E1E1E">
+            <ui:Card Margin="0,0,0,20" Background="MintCream">
                 <StackPanel>
                     <TextBlock Text="Master Control" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <Grid>

@@ -24,9 +24,12 @@ namespace PulseFlow.ViewModels.Pages
         public ChartValues<double> PressValuesA { get; } = new();
         public ChartValues<double> PressValuesB { get; } = new();
         public ChartValues<double> PressValuesC { get; } = new();
+
+
         #endregion
 
         #region PROPERTIES
+
         [ObservableProperty] private string statusTextA = "데이터 대기 중...";
         [ObservableProperty] private string statusTextB = "데이터 대기 중...";
         [ObservableProperty] private string statusTextC = "데이터 대기 중...";
@@ -41,6 +44,8 @@ namespace PulseFlow.ViewModels.Pages
         #endregion
 
         #region CONSTRUCTORS
+
+
         public DashboardViewModel(IMachineControlService machineControlService)
         {
             this.machineControlService = machineControlService;
@@ -48,11 +53,18 @@ namespace PulseFlow.ViewModels.Pages
             this.timer.Tick += UpdateDashboardData;
             this.timer.Start();
         }
+
+
         #endregion
 
         #region COMMANDS
+
+
         [RelayCommand] private async Task StopMachineAsync(string machineName) => await machineControlService.StopMachineAsync(machineName);
+        
+        
         [RelayCommand] private async Task StartMachineAsync(string machineName) => await machineControlService.StartMachineAsync(machineName);
+
 
         [RelayCommand]
         private async Task ToggleMachineAsync(string machineName)
@@ -60,6 +72,8 @@ namespace PulseFlow.ViewModels.Pages
             bool targetState = machineName switch { "Machine_A" => IsMachineA_Running, "Machine_B" => IsMachineB_Running, "Machine_C" => IsMachineC_Running, _ => false };
             if (targetState) await StartMachineAsync(machineName); else await StopMachineAsync(machineName);
         }
+
+
 
         [RelayCommand]
         private async Task StopAllAsync()
@@ -70,6 +84,8 @@ namespace PulseFlow.ViewModels.Pages
             await StopMachineAsync("Machine_C");
         }
 
+
+
         [RelayCommand]
         private async Task StartAllAsync()
         {
@@ -78,9 +94,13 @@ namespace PulseFlow.ViewModels.Pages
             await StartMachineAsync("Machine_B");
             await StartMachineAsync("Machine_C");
         }
+
+
         #endregion
 
         #region METHODS
+
+
         private void UpdateDashboardData(object? sender, EventArgs e)
         {
             try
@@ -95,7 +115,14 @@ namespace PulseFlow.ViewModels.Pages
 
         private void UpdateMachineData(PulseFlowDbContext context, string name, ChartValues<double> tVals, ChartValues<double> pVals, bool run, Action<string> update)
         {
-            if (!run) { update("정지됨"); return; }
+            if (!run) { 
+                
+                update("정지됨");
+                tVals.Add(double.NaN);
+                pVals.Add(double.NaN);
+
+                return; 
+            }
             var log = context.SensorLogs.Where(x => x.MachineName == name).OrderByDescending(x => x.LoggedAt).FirstOrDefault();
             if (log != null)
             {
@@ -107,6 +134,8 @@ namespace PulseFlow.ViewModels.Pages
 
         public Task OnNavigatedToAsync() => Task.CompletedTask;
         public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+
         #endregion
     }
 }

@@ -26,7 +26,7 @@ namespace PulseFlow.ViewModels.Pages
         private void InitializeViewModel()
         {
             CurrentTheme = ApplicationThemeManager.GetAppTheme();
-            AppVersion = $"UiDesktopApp1 - {GetAssemblyVersion()}";
+            AppVersion = $"{GetAssemblyVersion()}";
 
             _isInitialized = true;
         }
