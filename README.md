@@ -1,3 +1,4 @@
+
 # PulseFlow : 실시간 제조 장비 모니터링 대시보드
 
 ![C#](https://img.shields.io/badge/c%23-%23239120.svg?style=for-the-badge&logo=csharp&logoColor=white) ![.Net](https://img.shields.io/badge/.NET_8-5C2D91?style=for-the-badge&logo=.net&logoColor=white) ![WPF](https://img.shields.io/badge/WPF-5C2D91?style=for-the-badge&logo=windows&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -72,6 +73,13 @@ CREATE TABLE "SensorLogs_202606"
     FOR VALUES FROM ('2026-06-01 00:00:00+00') TO ('2026-07-01 00:00:00+00');
 
 ```
+
+<img width="1736" height="1046" alt="1" src="https://github.com/user-attachments/assets/f2f34ea5-67da-4d68-b7bf-65397796ca0d" />
+
+
+이러한 구조로 되어 있습니다.
+
+
 ### 2. 패키지 설치 및 DbContext 설정
 #### 1) 필수 Nuget 패키지 설치
 Install-Package Npgsql
