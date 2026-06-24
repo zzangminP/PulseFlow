@@ -27,8 +27,8 @@
 3. **기간별 통계 분석 (Analytics)**
    - 최근 1시간 / 24시간 / 전체 누적 데이터 필터링
    - Angular Gauge를 활용한 평균 수치 및 직관적인 위험 구간 시각화
-4. **엄격한 MVVM 아키텍처**
-   - View와 ViewModel의 완벽한 분리로 유지보수성 및 확장성 극대화 (`CommunityToolkit.Mvvm` 활용)
+4. **MVVM 아키텍처**
+   - View와 ViewModel의 분리로 유지보수성 및 확장성 극대화 (`CommunityToolkit.Mvvm` 활용)
 
 <br/>
 
